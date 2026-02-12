@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { getById } from "../service/serviceElectriHome";
-import { Link} from "react-router-dom";
+import { Link } from "react-router-dom";
 
 interface Producto {
-  id: number | string;
+  id: number; // Cambiado a number para consistencia con la DB
   nombre: string;
   descripcion: string;
   precio: number;
@@ -13,18 +13,24 @@ interface Producto {
 
 const API_BASE = 'https://electrohome-847j.onrender.com';
 
-function DetalleProducto() {
+// 1. Agregamos la interfaz para recibir la prop de App.tsx
+interface DetalleProps {
+  onOpenCart: () => void;
+}
+
+function DetalleProducto({ onOpenCart }: DetalleProps) { // 2. Recibimos la prop
   const { id } = useParams<{ id: string }>();
   const [producto, setProducto] = useState<Producto | null>(null);
   const [loading, setLoading] = useState(true);
-  const [agregado, setAgregado] = useState(false); // Estado visual temporal
+  const [agregado, setAgregado] = useState(false);
 
   useEffect(() => {
     const cargar = async () => {
       if (id) {
         try {
           setLoading(true);
-          const data = await getById(id);
+          // 3. CORRECCIÓN TS2345: Convertimos el id (string) a number
+          const data = await getById(Number(id)); 
           setProducto(data);
         } catch (error) {
           console.error("Error al cargar el producto:", error);
@@ -36,60 +42,52 @@ function DetalleProducto() {
     cargar();
   }, [id]);
 
-  // --- FUNCIÓN PARA AGREGAR AL CARRITO ---
   const agregarAlCarrito = () => {
     if (!producto) return;
 
-    // 1. Obtener lo que ya existe en el localStorage
     const carritoGuardado = localStorage.getItem("carrito_compras");
     let carrito: any[] = carritoGuardado ? JSON.parse(carritoGuardado) : [];
 
-    // 2. Verificar si el producto ya está en el carrito
     const itemExistente = carrito.find((item) => item.id === producto.id);
 
     if (itemExistente) {
-      // Si existe, aumentamos la cantidad
       carrito = carrito.map((item) =>
         item.id === producto.id ? { ...item, cantidad: item.cantidad + 1 } : item
       );
     } else {
-      // Si no existe, lo agregamos con cantidad 1
-      // Guardamos también la URL de la imagen para que el carrito la muestre
       const nuevoItem = {
         ...producto,
         cantidad: 1,
-        imagenUrl: `${API_BASE}/api/imagenes/${producto.id}` 
       };
       carrito.push(nuevoItem);
     }
 
-    // 3. Guardar de nuevo en LocalStorage
     localStorage.setItem("carrito_compras", JSON.stringify(carrito));
 
-    // 4. DISPARAR EVENTO para que el Header y el Carrito se actualicen automáticamente
+    // 4. Actualizar estado global y abrir el carrito
     window.dispatchEvent(new Event("storage"));
+    onOpenCart(); // Esto abre el drawer automáticamente al hacer clic
 
-    // 5. Feedback visual rápido
     setAgregado(true);
     setTimeout(() => setAgregado(false), 2000);
   };
 
-  if (loading) return <div className="p-50flex h-screen items-center justify-center font-bold animate-pulse text-2xl text-center p-80">Cargando producto...</div>;
+  if (loading) return <div className="flex h-screen items-center justify-center font-bold animate-pulse text-2xl text-center">Cargando producto...</div>;
   if (!producto) return <div className="p-10 text-center">Producto no encontrado.</div>;
 
   return (
-    
-    <div className="max-w-4xl mx-auto p-6 md:pt-32">
-         <Link to="/" className="text-[10px] font-black text-gray-400 hover:text-black transition-all uppercase tracking-[0.3em] border-b-2 border-transparent hover:border-black ml-160">
-            Volver al catálogo
-          </Link>
-      <div className="grid md:grid-cols-2 gap-8">
-         
-        <div className="bg-gray-100 rounded-3xl overflow-hidden">
+    <div className="max-w-4xl mx-auto p-6 pt-32">
+      <Link to="/" className="text-[10px] font-black text-gray-400 hover:text-black transition-all uppercase tracking-[0.3em] border-b-2 border-transparent hover:border-black mb-8 inline-block">
+        Volver al catálogo
+      </Link>
+      
+      <div className="grid md:grid-cols-2 gap-12">
+        <div className="bg-gray-100 rounded-3xl overflow-hidden aspect-square flex items-center justify-center p-8">
           <img 
             src={`${API_BASE}/api/imagenes/${producto.id}`}
             alt={producto.nombre} 
-            className="w-full h-full object-cover"
+            className="max-w-full max-h-full object-contain mix-blend-multiply"
+            onError={(e) => { (e.target as HTMLImageElement).src = "https://placehold.co/600x600?text=ElectroHome"; }}
           />
         </div>
 
