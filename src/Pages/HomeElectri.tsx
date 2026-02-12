@@ -19,12 +19,8 @@ interface Producto {
   descripcion?: string;
 }
 
-interface HomeProps {
-  onOpenCart: () => void;
-}
 
-function HomeElectri({ onOpenCart }: HomeProps) { 
-  // Estados tipados correctamente
+function HomeElectri() { // Recibimos el objeto vacío para mantener la estructura
   const [productos, setProductos] = useState<Producto[]>([]);
   const [productosFiltrados, setProductosFiltrados] = useState<Producto[]>([]);
   const [categorias, setCategorias] = useState<Categoria[]>([]);
@@ -177,8 +173,6 @@ function HomeElectri({ onOpenCart }: HomeProps) {
                     <h3 className="font-bold text-gray-900 text-xl mb-2 line-clamp-2 h-[3.5rem] leading-tight hover:underline">{p.nombre}</h3>
                   </Link>
                   <p className="text-2xl font-black text-black mb-4">${p.precio?.toLocaleString()}</p>
-
-                  {/* Aquí podrías añadir un botón de "Añadir al carrito" que use onOpenCart() si quisieras */}
 
                   {isAdmin && (
                     <div className="flex gap-2 mt-auto pt-4 border-t border-gray-100">

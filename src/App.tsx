@@ -31,7 +31,7 @@ function App() {
         <Routes>
           <Route
             path="/"
-            element={<HomeElectri onOpenCart={abrirCarrito} />}
+            element={<HomeElectri />}
           />
           <Route path="/auth" element={<Auth />} />
           <Route path="/nuevo-producto" element={<AddForm />} />
