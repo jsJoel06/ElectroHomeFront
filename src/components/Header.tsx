@@ -31,16 +31,29 @@ function Header({ onOpenCart }: HeaderProps) {
         return () => window.removeEventListener("scroll", onScroll);
     }, []);
 
-    const handleLogout = async () => {
-        setMenuOpen(false);
-        setMobileNavOpen(false);
-        localStorage.removeItem("isAuthenticated");
-        localStorage.removeItem("email");
-        setAuth({ isAuthenticated: false, userEmail: null });
-        postLogout().catch(() => { });
-        navigate("/auth", { replace: true });
-    };
+ const handleLogout = async () => {
+    // 1. Cerramos los menús visuales
+    setMenuOpen(false);
+    setMobileNavOpen(false);
 
+    // 2. Limpiamos el almacenamiento local
+    localStorage.removeItem("isAuthenticated");
+    localStorage.removeItem("email");
+
+    // 3. Actualizamos el estado local (opcional si vas a refrescar, pero es buena práctica)
+    setAuth({ isAuthenticated: false, userEmail: null });
+
+    try {
+        // 4. Intentamos notificar al backend
+        await postLogout();
+    } catch (error) {
+        console.error("Error en logout:", error);
+    }
+
+    // 5. REFRESCAR Y REDIRIGIR
+    // Esto fuerza al navegador a recargar la página en la ruta de inicio
+    window.location.href = "/"; 
+};
     return (
         <>
             <header className={`fixed top-0 w-full z-50 bg-white transition-all ${isScrolled ? "shadow-sm h-16" : "h-20"}`}>
