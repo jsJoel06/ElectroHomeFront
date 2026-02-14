@@ -1,6 +1,6 @@
 import { FiShoppingCart, FiMenu, FiX, FiSearch } from "react-icons/fi";
 import { CiUser, CiLogout } from "react-icons/ci";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { postLogout } from "../service/authService";
 
@@ -14,8 +14,7 @@ interface HeaderProps {
 }
 
 function Header({ onOpenCart }: HeaderProps) {
-    const navigate = useNavigate();
-
+    
     const [isScrolled, setIsScrolled] = useState(false);
     const [menuOpen, setMenuOpen] = useState(false);
     const [mobileNavOpen, setMobileNavOpen] = useState(false);
