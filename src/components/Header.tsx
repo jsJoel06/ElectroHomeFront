@@ -9,7 +9,6 @@ interface AuthState {
     userEmail: string | null;
 }
 
-// 1. Agregamos la interfaz para recibir la función
 interface HeaderProps {
     onOpenCart: () => void;
 }
@@ -59,7 +58,7 @@ function Header({ onOpenCart }: HeaderProps) {
                         </Link>
                     </div>
 
-                    {/* CENTRO */}
+                    {/* CENTRO (Escritorio) */}
                     <nav className="hidden md:flex flex-1 justify-center gap-8 text-[11px] font-black uppercase tracking-widest">
                         <Link to="/" className="hover:text-gray-500">Inicio</Link>
                         <Link to="/catalogo" className="hover:text-gray-500">Catálogo</Link>
@@ -74,7 +73,6 @@ function Header({ onOpenCart }: HeaderProps) {
                             <input type="text" placeholder="Buscar productos" className="outline-none bg-transparent w-40" />
                         </div>
 
-                        {/* 2. CAMBIADO: De <Link> a <button> para abrir el carrito */}
                         <button 
                             onClick={onOpenCart} 
                             className="p-2 hover:bg-gray-100 rounded-full transition-colors"
@@ -83,7 +81,6 @@ function Header({ onOpenCart }: HeaderProps) {
                             <FiShoppingCart size={20} />
                         </button>
 
-                        {/* USER MENU */}
                         <div className="relative">
                             <button onClick={() => setMenuOpen(!menuOpen)} className="p-2 rounded-full hover:bg-gray-100">
                                 <CiUser size={22} />
@@ -107,15 +104,24 @@ function Header({ onOpenCart }: HeaderProps) {
                 </div>
             </header>
 
-            {/* MENÚ MÓVIL */}
+            {/* MENÚ MÓVIL ACTUALIZADO */}
             {mobileNavOpen && (
                 <div className="fixed inset-0 z-[100] bg-white p-6 md:hidden animate-in slide-in-from-left duration-300">
-                    <button onClick={() => setMobileNavOpen(false)} className="mb-6 p-2 bg-gray-100 rounded-full"><FiX size={24} /></button>
+                    <div className="flex justify-between items-center mb-10">
+                        <div className="bg-black text-white w-9 h-9 flex items-center justify-center font-black rounded-xl">E</div>
+                        <button onClick={() => setMobileNavOpen(false)} className="p-2 bg-gray-100 rounded-full">
+                            <FiX size={24} />
+                        </button>
+                    </div>
+                    
                     <nav className="flex flex-col gap-6 text-2xl font-black uppercase">
                         <Link to="/" onClick={() => setMobileNavOpen(false)}>Inicio</Link>
                         <Link to="/catalogo" onClick={() => setMobileNavOpen(false)}>Catálogo</Link>
                         <Link to="/nosotros" onClick={() => setMobileNavOpen(false)}>Nosotros</Link>
+                        {/* Se agrega Pedidos aquí para que aparezca en el móvil */}
+                        <Link to="/pedidos" onClick={() => setMobileNavOpen(false)}>Pedidos</Link>
                     </nav>
+
                 </div>
             )}
 
