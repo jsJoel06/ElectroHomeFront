@@ -9,8 +9,8 @@ const apiInstance = axios.create({
     baseURL: API,
     timeout: 90000, 
     headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
+        'Accept': 'application/json'
+        // Eliminado 'Content-Type' global para evitar conflictos con FormData
     }
 });
 
@@ -43,7 +43,9 @@ export const getProduc = async () => {
     }
 };
 
-// NUEVO: Método optimizado usando Axios con seguridad integrada para traer las categorías del Sidebar
+/**
+ * Obtiene todas las categorías de forma segura
+ */
 export const getAllCategorias = async () => {
     try {
         const response = await apiInstance.get(`/api/categorias`);
@@ -107,7 +109,9 @@ export const actualizarProductos = async (id: number, productoData: any, fileIma
         }
 
         const response = await apiInstance.put(`/api/productos/${id}`, formData, {
-            headers: { 'Content-Type': 'multipart/form-data' }
+            headers: { 
+                'Content-Type': 'multipart/form-data' 
+            }
         });
         return response.data;
     } catch (error) {
