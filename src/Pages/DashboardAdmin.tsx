@@ -1,11 +1,11 @@
 import { useEffect, useState, useCallback } from "react";
-import { 
-  FiPackage, FiTruck, FiCheckCircle, 
-  FiDollarSign, FiTrendingUp, FiArrowUpRight, FiArrowDownRight, FiActivity 
+import {
+  FiPackage, FiTruck, FiCheckCircle,
+  FiDollarSign, FiTrendingUp, FiArrowUpRight, FiArrowDownRight, FiActivity
 } from "react-icons/fi";
-import { 
-  AreaChart, Area, XAxis, YAxis, CartesianGrid, 
-  Tooltip, ResponsiveContainer, BarChart, Bar, Cell 
+import {
+  AreaChart, Area, XAxis, YAxis, CartesianGrid,
+  Tooltip, ResponsiveContainer, BarChart, Bar, Cell
 } from 'recharts';
 
 // --- TIPADOS ---
@@ -52,7 +52,7 @@ export default function DashboardAdmin() {
   return (
     <div className="min-h-screen bg-[#F8FAFC] p-4 md:p-10 font-sans text-slate-900 mt-10">
       <div className="max-w-7xl mx-auto">
-        
+
         {/* HEADER */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-6">
           <div>
@@ -61,60 +61,59 @@ export default function DashboardAdmin() {
             </div>
             <h1 className="text-4xl font-black tracking-tight text-slate-900">Análisis Comercial</h1>
           </div>
-            
+
           <div className="flex bg-slate-200/50 p-1 rounded-2xl border border-slate-200 backdrop-blur-md">
             {(['hoy', 'semana', 'mes', 'año'] as TimeRange[]).map((r) => (
               <button
                 key={r}
                 onClick={() => setRange(r)}
-                className={`px-5 py-2 rounded-xl text-xs font-bold uppercase transition-all duration-300 ${
-                  range === r 
-                    ? "bg-white text-indigo-600 shadow-sm scale-105" 
+                className={`px-5 py-2 rounded-xl text-xs font-bold uppercase transition-all duration-300 ${range === r
+                    ? "bg-white text-indigo-600 shadow-sm scale-105"
                     : "text-slate-500 hover:text-slate-700"
-                }`}
+                  }`}
               >
                 {r}
               </button>
-            ))} 
+            ))}
           </div>
         </div>
- 
+
         {/* CARDS */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
           <StatCard title="Ingresos Totales" value={`$${stats?.totalVentas.toLocaleString()}`} icon={<FiDollarSign />} color="bg-indigo-600" trend={stats?.crecimiento} />
           <StatCard title="Pedidos" value={stats?.totalPedidos} icon={<FiPackage />} color="bg-blue-500" trend={3.1} />
           <StatCard title="En Camino" value={stats?.enviados} icon={<FiTruck />} color="bg-amber-500" />
           <StatCard title="Entregados" value={stats?.entregados} icon={<FiCheckCircle />} color="bg-emerald-500" />
-        </div> 
-   
+        </div>
+
         {/* GRÁFICOS CORREGIDOS */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-           
+
           {/* FLUJO DE INGRESOS (AreaChart) */}
           <div className="lg:col-span-2 bg-white p-8 rounded-[2.5rem] shadow-sm border border-slate-200">
             <h3 className="text-xl font-bold mb-8 flex items-center gap-2">
               <FiTrendingUp className="text-indigo-600" /> Flujo de Ingresos
-            </h3> 
+            </h3>
             <div className="h-[350px] w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={dataHistorial} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                   <defs>
                     <linearGradient id="colorSales" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#6366f1" stopOpacity={0.2}/>
-                      <stop offset="95%" stopColor="#6366f1" stopOpacity={0}/>
+                      <stop offset="5%" stopColor="#6366f1" stopOpacity={0.2} />
+                      <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
                     </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                  <XAxis dataKey="nombre" axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 12}} dy={10} />
-                  <YAxis axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 12}} />
+                  <XAxis dataKey="nombre" axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 12 }} dy={10} />
+                  <YAxis axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 12 }} />
                   <Tooltip content={<CustomTooltip />} />
-                  <Area 
-                    type="monotone" 
-                    dataKey="ventas" 
-                    stroke="#6366f1" 
-                    strokeWidth={4} 
-                    fillOpacity={1} 
-                    fill="url(#colorSales)" 
+                  <Area
+                    type="monotone"
+                    dataKey="ventas"
+                    stroke="#6366f1"
+                    strokeWidth={4}
+                    fillOpacity={1}
+                    fill="url(#colorSales)"
                     animationDuration={1500}
                   />
                 </AreaChart>
@@ -129,14 +128,14 @@ export default function DashboardAdmin() {
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={dataHistorial}>
                   <Bar dataKey="pedidos" radius={[6, 6, 6, 6]}>
-                    {dataHistorial.map((entry, index) => (
-                      <Cell 
-                        key={`cell-${index}`} 
-                        fill={index === (dataHistorial.length - 1) ? '#6366f1' : '#E2E8F0'} 
+                    {dataHistorial.map((_, index) => (
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={index === (dataHistorial.length - 1) ? '#6366f1' : '#E2E8F0'}
                       />
                     ))}
                   </Bar>
-                  <Tooltip cursor={{fill: 'transparent'}} content={({active, payload}) => {
+                  <Tooltip cursor={{ fill: 'transparent' }} content={({ active, payload }) => {
                     if (active && payload && payload.length) {
                       return (
                         <div className="bg-slate-900 text-white px-3 py-1.5 rounded-xl text-xs font-bold shadow-xl">
@@ -145,11 +144,11 @@ export default function DashboardAdmin() {
                       )
                     }
                     return null;
-                  }}/>
+                  }} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
-            
+
             <div className="mt-8 p-6 bg-slate-50 rounded-3xl border border-slate-100">
               <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1 text-center">Promedio Diario</p>
               <p className="text-3xl font-black text-slate-800 text-center">
@@ -204,7 +203,7 @@ function SkeletonUI() {
       <div className="max-w-7xl mx-auto">
         <div className="h-10 bg-slate-200 w-64 rounded-xl mb-12"></div>
         <div className="grid grid-cols-4 gap-6 mb-12">
-          {[1,2,3,4].map(i => <div key={i} className="h-44 bg-slate-200 rounded-[2rem]"></div>)}
+          {[1, 2, 3, 4].map(i => <div key={i} className="h-44 bg-slate-200 rounded-[2rem]"></div>)}
         </div>
         <div className="h-[400px] bg-slate-200 rounded-[2.5rem]"></div>
       </div>

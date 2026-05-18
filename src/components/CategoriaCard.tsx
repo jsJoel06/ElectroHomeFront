@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { getCategorias } from '../service/categoriaService'
 import { Tv, Refrigerator, WashingMachine, Microwave, Coffee, Flame, LayoutGrid } from 'lucide-react'
 

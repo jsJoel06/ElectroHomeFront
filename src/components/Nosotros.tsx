@@ -1,4 +1,4 @@
-import React from 'react';
+
 import { Shield, Zap, Star, Globe, ArrowRight } from 'lucide-react';
 
 const Nosotros = () => {
