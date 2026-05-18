@@ -2,10 +2,9 @@ import axios from "axios";
 
 const API_URL = "https://electrohome-847j.onrender.com";
 
-// 1. Creamos una instancia centralizada
+// 1. Creamos una instancia centralizada sin 'withCredentials' para evitar bloqueos CORS por cookies
 const api = axios.create({
   baseURL: API_URL,
-  withCredentials: true, // Crucial para conectar con tu Java SecurityConfig
   headers: {
     "Content-Type": "application/json",
   },
@@ -30,7 +29,6 @@ api.interceptors.request.use((config) => {
 
 export const postLogin = async (email: string, password: string) => {
   try {
-    // Usamos 'api' en lugar de 'axios' global
     const response = await api.post(`/api/auth/login`, {
       email,
       password,
@@ -63,7 +61,6 @@ export const postLogout = async () => {
     console.error("Error en el servicio logout:", error);
     throw error;
   } finally {
-    // Limpiamos siempre al salir
     localStorage.removeItem("password");
     localStorage.removeItem("isAuthenticated");
     localStorage.removeItem("email");
@@ -71,11 +68,10 @@ export const postLogout = async () => {
   }
 };
 
-// --- SERVICIOS DE PRODUCTOS (Asegúrate de usarlos así) ---
+// --- SERVICIOS DE PRODUCTOS Y CATEGORÍAS ---
 
 export const getProducts = async () => {
   try {
-    // Gracias al interceptor, esta llamada ya lleva la seguridad incluida
     const response = await api.get("/api/productos");
     return response.data;
   } catch (error) {

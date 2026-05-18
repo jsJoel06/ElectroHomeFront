@@ -2,13 +2,22 @@ import React, { useState } from "react";
 import { postLogin, PostRegister } from "../../service/authService";
 import { useNavigate } from "react-router-dom";
 
+// Interfaz adaptada al formato JSON real devuelto por Spring Security
 interface LoginResponse {
   authenticated: boolean;
   name: string;
-  authorities: { authority: string }[];
+  authorities: { 
+    authority: string; 
+    issuedAt?: string; 
+  }[];
   principal: {
     id: number;
     email: string;
+    username: string;
+    enabled: boolean;
+    accountNonExpired: boolean;
+    accountNonLocked: boolean;
+    credentialsNonExpired: boolean;
   };
 }
 
@@ -25,7 +34,13 @@ function Auth() {
     try {
       if (isLogin) {
         const response: LoginResponse = await postLogin(email, password);
-        const role = response.authorities[0]?.authority || "USER";
+        
+        // Buscamos de manera segura el rol de negocio del cliente, saltando metadatos de Spring
+        const businessAuthority = response.authorities.find(
+          (auth) => auth.authority !== "FACTOR_PASSWORD"
+        );
+        const role = businessAuthority ? businessAuthority.authority : "CLIENT";
+
         localStorage.setItem('authority', role);
         localStorage.setItem('email', response.name); 
         localStorage.setItem('password', password);
@@ -33,11 +48,18 @@ function Auth() {
         navigate('/');
       } else {
         await PostRegister(email, password);
-        alert("¡Cuenta creada! Ahora puedes explorar nuestra colección.");
+        alert("¡Cuenta creada con éxito! Ahora puedes ingresar a la tienda.");
         setIsLogin(true);
       }
-    } catch (error) {
-      alert("Credenciales incorrectas. Inténtalo de nuevo.");
+    } catch (error: any) {
+      // Discriminación precisa de errores para no culpar falsamente a las credenciales si falla el servidor
+      if (error.message === "Network Error" || error.code === "ERR_NETWORK") {
+        alert("Error de conexión. Si el servidor de Render está inactivo, puede tomar cerca de un minuto en responder. Por favor, reintenta en breve.");
+      } else if (isLogin) {
+        alert("Credenciales incorrectas o cuenta inexistente. Inténtalo de nuevo.");
+      } else {
+        alert("Hubo un problema al crear tu perfil. Verifica tus datos o si el correo ya está registrado.");
+      }
     } finally {
       setLoading(false);
     }
@@ -46,7 +68,7 @@ function Auth() {
   return (
     <div className="min-h-screen bg-white flex flex-col md:flex-row">
       
-      {/* SECCIÓN IZQUIERDA: Visual/Brand (Oculta en móviles) */}
+      {/* SECCIÓN IZQUIERDA: Visual/Brand */}
       <div className="hidden md:flex md:w-1/2 bg-[#f4f4f4] items-center justify-center p-20">
         <div className="max-w-md">
           <h2 className="text-6xl font-black tracking-tighter leading-none mb-6">
