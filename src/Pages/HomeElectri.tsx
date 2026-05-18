@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react"
-import { getProduc, deleteProducto } from "../service/serviceElectriHome";
-import { Link, useLocation } from "react-router-dom"; // Añadido useLocation
+// Importamos getAllCategorias que usa Axios con el interceptor protegido
+import { getProduc, deleteProducto, getAllCategorias } from "../service/serviceElectriHome";
+import { Link, useLocation } from "react-router-dom"; 
 import Footer from "../components/Footer";
 
 const API_BASE = 'https://electrohome-847j.onrender.com';
 
-// --- INTERFACES ---
 interface Categoria {
   id: number;
   nombre: string;
@@ -21,7 +21,7 @@ interface Producto {
 }
 
 function HomeElectri() {
-  const location = useLocation(); // Hook para leer la URL
+  const location = useLocation(); 
   const [productos, setProductos] = useState<Producto[]>([]);
   const [productosFiltrados, setProductosFiltrados] = useState<Producto[]>([]);
   const [categorias, setCategorias] = useState<Categoria[]>([]);
@@ -33,17 +33,21 @@ function HomeElectri() {
   const [showCats, setShowCats] = useState<boolean>(true);
   const [showPrecio, setShowPrecio] = useState<boolean>(true);
 
+  // Carga de datos secuencial para proteger los recursos limitados de Render Free tier
   const cargarTodo = async () => {
     try {
       setLoading(true);
-      const [resProductos, resCategorias]: [Producto[], Categoria[]] = await Promise.all([
-        getProduc(),
-        fetch(`${API_BASE}/api/categorias`).then(res => res.json())
-      ]);
+      
+      // 1. Cargamos primero los productos de manera segura
+      const resProductos = await getProduc();
       setProductos(resProductos);
+
+      // 2. Cargamos las categorías de manera segura usando nuestra instancia de Axios
+      const resCategorias = await getAllCategorias();
       setCategorias(resCategorias);
+      
     } catch (error) {
-      console.error("Error cargando datos:", error);
+      console.error("Error cargando datos en la vista Home:", error);
     } finally {
       setLoading(false);
     }
@@ -55,18 +59,15 @@ function HomeElectri() {
     setIsAdmin(role === 'ADMIN' || role === 'ROLE_ADMIN');
   }, []);
 
-  // --- LÓGICA PARA RECIBIR LA CATEGORÍA DE SECCIONCATEGORIAS ---
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const catId = params.get('cat');
     if (catId) {
       const idNumerico = Number(catId);
       setCategoriasSeleccionadas([idNumerico]);
-      
-      // Opcional: Hacer scroll suave hacia los productos cuando se selecciona una categoría
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
-  }, [location.search]); // Se ejecuta cada vez que la URL cambia
+  }, [location.search]); 
 
   useEffect(() => {
     const filtrados = productos.filter(p => {
@@ -109,13 +110,10 @@ function HomeElectri() {
     <div className="min-h-screen bg-white text-gray-900 mt-15">
       <div className="flex max-w-[1500px] mx-auto px-12 py-10 gap-16">
 
-        {/* Sidebar */}
+        
         <aside className="w-72 hidden md:block shrink-0">
           {isAdmin && (
-            <Link
-              to="/nuevo-producto"
-              className="flex items-center justify-center gap-3 w-full bg-black text-white py-4 rounded-2xl font-bold text-sm transition-all hover:bg-zinc-800 active:scale-[0.98] shadow-sm mb-10"
-            >
+            <Link to="/nuevo-producto" className="flex items-center justify-center gap-3 w-full bg-black text-white py-4 rounded-2xl font-bold text-sm transition-all hover:bg-zinc-800 active:scale-[0.98] shadow-sm mb-10">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
               <span>NUEVO PRODUCTO</span>
             </Link>
@@ -164,12 +162,12 @@ function HomeElectri() {
           </div>
         </aside>
 
-        {/* Main Grid */}
+        
         <main className="flex-1">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-10 gap-y-16">
             {productosFiltrados.map((p) => (
               <div key={p.id} className="flex flex-col group h-full">
-                <Link to={`/producto/${p.id}`} className="block mb-4">
+                <Link to="{`/producto/${p.id}`}" className="block mb-4">
                   <div className="aspect-square w-full h-[320px] bg-[#f8f8f8] rounded-[2.5rem] flex items-center justify-center p-10 relative overflow-hidden transition-all group-hover:bg-[#f2f2f2]">
                     <img
                       src={`${API_BASE}/api/imagenes/${p.id}`}
@@ -182,7 +180,7 @@ function HomeElectri() {
 
                 <div className="px-2 flex flex-col flex-grow">
                   <p className="text-[10px] uppercase tracking-[0.2em] text-gray-400 font-bold mb-2 ">{p.categoria?.nombre || 'General'}</p>
-                  <Link to={`/producto/${p.id}`}>
+                  <Link to="{`/producto/${p.id}`}">
                     <h3 className="font-bold text-gray-900 text-xl mb-2 line-clamp-2 h-[3.5rem] leading-tight hover:no-underline">{p.nombre}</h3>
                   </Link>
 
@@ -204,10 +202,7 @@ function HomeElectri() {
 
                   {isAdmin && (
                     <div className="flex gap-2 mt-auto pt-4 border-t border-gray-100">
-                      <Link
-                        to={`/editar-producto/${p.id}`}
-                        className="flex-1 bg-gray-100 text-black text-center py-2 rounded-xl text-xs font-bold hover:bg-black hover:text-white transition-colors"
-                      >
+                      <Link to="{`/editar-producto/${p.id}`}" className="flex-1 bg-gray-100 text-black text-center py-2 rounded-xl text-xs font-bold hover:bg-black hover:text-white transition-colors">
                         EDITAR
                       </Link>
                       <button
@@ -224,7 +219,7 @@ function HomeElectri() {
           </div>
         </main>
       </div>
-      <Footer />
+      <Footer/>
     </div>
   );
 }
