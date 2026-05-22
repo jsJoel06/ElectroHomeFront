@@ -101,7 +101,7 @@ function Header({ onOpenCart }: HeaderProps) {
                     </nav>
 
                     {/* DERECHA */}
-                    <div className="flex items-center gap-3 flex-shrink-0">
+                    <div className="flex items-center gap-3 ml-auto">
 
                         <div className="hidden md:flex items-center gap-2 border rounded-full px-4 py-2 text-sm text-gray-500">
                             <FiSearch size={16} />
@@ -121,7 +121,7 @@ function Header({ onOpenCart }: HeaderProps) {
                         </button>
 
                         {/* USUARIO */}
-                        <div className="relative">
+                        <div className="relative ml-auto sm:ml-0">
                             <button onClick={() => setMenuOpen(!menuOpen)} className="p-2 rounded-full hover:bg-gray-100">
                                 <CiUser size={22} />
                             </button>
