@@ -5,7 +5,6 @@ const API_URL = 'https://electrohome-847j.onrender.com/api/categorias';
 
 const api = axios.create({
   baseURL: API_URL,
-  withCredentials: true,
   headers: {
     "Content-Type": "application/json",
   },
